@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
 
         final EditText giris = new EditText(this);
         giris.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        giris.setHint("Şifre");
+        giris.setHint("Eşleşme Kodu");
         giris.setHintTextColor(0x99FFFFFF);
         giris.setTextColor(0xFFFFFFFF);
         giris.setGravity(Gravity.CENTER);
