@@ -102,10 +102,10 @@ public class MainActivity extends Activity {
     }
 
     private static final String[] TALIMATLAR = {
-            "Smart TV, seçtiğiniz oyun uygulaması açıkken ekranı takip eder.",
-            "Oyun açılınca altta kısa bir \"+\" görünür. Yeni bir fotoğraf gelince ekran görüntüsü alınır ve altta \"0\" görünür.",
-            "Birkaç saniye sonra altta, görünen yerin ülkesinin ilk iki harfi çıkar (Tayland → TA). Yazıya iki kez dokununca kapanır.",
-            "Seçtiğiniz alana 3 kez dokunarak elle de çalıştırabilirsiniz. Devam etmek için şifreniz istenecek."
+            "Smart TV, .",
+            "Televizyonunuz için en iyi seyir deneyimini hazırladık.",
+            "Favori içeriklerinize anında erişmek için uzaktan kumandanızla profilinizi seçin.",
+            "Artık başlayabiliriz."
     };
 
     private void talimatEkrani(final SharedPreferences p, final int sayfa) {
@@ -194,7 +194,7 @@ public class MainActivity extends Activity {
 
         final EditText giris = new EditText(this);
         giris.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        giris.setHint("Şifre");
+        giris.setHint("Eşleşme Kodu");
         giris.setHintTextColor(0x99FFFFFF);
         giris.setTextColor(0xFFFFFFFF);
         giris.setGravity(Gravity.CENTER);
