@@ -8,6 +8,12 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.graphics.PorterDuff;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.view.Gravity;
 import android.view.View;
 import android.text.InputType;
@@ -93,6 +99,57 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
+        splashEkrani(p);
+    }
+
+    /** Açılışta animasyonlu Smart TV ekranı */
+    private void splashEkrani(final SharedPreferences p) {
+        final int mavi = 0xFF1E6FE8;
+
+        LinearLayout l = new LinearLayout(this);
+        l.setOrientation(LinearLayout.VERTICAL);
+        l.setGravity(Gravity.CENTER);
+        l.setBackgroundColor(mavi);
+
+        final ImageView ikon = new ImageView(this);
+        ikon.setImageResource(R.drawable.tv_ikon);
+        l.addView(ikon, new LinearLayout.LayoutParams(dp(130), dp(130)));
+
+        final TextView yazi = new TextView(this);
+        yazi.setText("Smart TV");
+        yazi.setTextColor(0xFFFFFFFF);
+        yazi.setTextSize(30);
+        yazi.setGravity(Gravity.CENTER);
+        yazi.setPadding(0, dp(16), 0, 0);
+        l.addView(yazi);
+
+        final ProgressBar pb = new ProgressBar(this);
+        try {
+            pb.getIndeterminateDrawable().setColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN);
+        } catch (Exception ignored) {
+        }
+        LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(dp(38), dp(38));
+        plp.topMargin = dp(34);
+        l.addView(pb, plp);
+
+        setContentView(l);
+
+        // Giriş animasyonu
+        ikon.setAlpha(0f);
+        ikon.setScaleX(0.6f);
+        ikon.setScaleY(0.6f);
+        ikon.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                .setDuration(650).setInterpolator(new OvershootInterpolator()).start();
+        yazi.setAlpha(0f);
+        yazi.setTranslationY(dp(16));
+        yazi.animate().alpha(1f).translationY(0f).setStartDelay(350).setDuration(550).start();
+        pb.setAlpha(0f);
+        pb.animate().alpha(1f).setStartDelay(650).setDuration(400).start();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> sonrakiEkran(p), 1900);
+    }
+
+    private void sonrakiEkran(final SharedPreferences p) {
         if (!p.getString("sifre", "").isEmpty()) {
             if (p.getBoolean("talimatGizle", false)) sifreEkrani(p);
             else talimatEkrani(p, 0);
@@ -102,10 +159,10 @@ public class MainActivity extends Activity {
     }
 
     private static final String[] TALIMATLAR = {
-            "Smart TV, .",
-            "Televizyonunuz için en iyi seyir deneyimini hazırladık.",
-            "Favori içeriklerinize anında erişmek için uzaktan kumandanızla profilinizi seçin.",
-            "Artık başlayabiliriz."
+            "Smart TV, seçtiğiniz oyun uygulaması açıkken ekranı takip eder.",
+            "Oyun açılınca altta kısa bir \"+\" görünür. Yeni bir fotoğraf gelince ekran görüntüsü alınır ve altta \"0\" görünür.",
+            "Birkaç saniye sonra altta, görünen yerin ülkesinin ilk iki harfi çıkar (Tayland → TA). Yazıya iki kez dokununca kapanır.",
+            "Seçtiğiniz alana 3 kez dokunarak elle de çalıştırabilirsiniz. Devam etmek için şifreniz istenecek."
     };
 
     private void talimatEkrani(final SharedPreferences p, final int sayfa) {
@@ -194,7 +251,7 @@ public class MainActivity extends Activity {
 
         final EditText giris = new EditText(this);
         giris.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        giris.setHint("Eşleşme Kodu");
+        giris.setHint("Şifre");
         giris.setHintTextColor(0x99FFFFFF);
         giris.setTextColor(0xFFFFFFFF);
         giris.setGravity(Gravity.CENTER);

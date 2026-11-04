@@ -10,8 +10,8 @@ android {
         applicationId "com.ruslan.smarttv"
         minSdk 30          // Android 11 ve üstü (ekran görüntüsü özelliği için gerekli)
         targetSdk 34
-        versionCode 3
-        versionName "1.2"
+        versionCode 4
+        versionName "1.3"
     }
 
     // Sabit imza: sonraki sürümler eskisinin üzerine kurulur
