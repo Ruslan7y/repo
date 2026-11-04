@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.Gravity;
+import android.view.View;
 import android.text.InputType;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -91,36 +93,145 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
-        if (!p.getString("sifre", "").isEmpty()) sifreEkrani(p);
-        else ayarlarEkrani(p);
+        if (!p.getString("sifre", "").isEmpty()) {
+            if (p.getBoolean("talimatGizle", false)) sifreEkrani(p);
+            else talimatEkrani(p, 0);
+        } else {
+            ayarlarEkrani(p);
+        }
+    }
+
+    private static final String[] TALIMATLAR = {
+            "Smart TV, seçtiğiniz oyun uygulaması açıkken ekranı takip eder.",
+            "Oyun açılınca altta kısa bir \"+\" görünür. Yeni bir fotoğraf gelince ekran görüntüsü alınır ve altta \"0\" görünür.",
+            "Birkaç saniye sonra altta, görünen yerin ülkesinin ilk iki harfi çıkar (Tayland → TA). Yazıya iki kez dokununca kapanır.",
+            "Seçtiğiniz alana 3 kez dokunarak elle de çalıştırabilirsiniz. Devam etmek için şifreniz istenecek."
+    };
+
+    private void talimatEkrani(final SharedPreferences p, final int sayfa) {
+        final int mavi = 0xFF1E6FE8;
+
+        LinearLayout l = new LinearLayout(this);
+        l.setOrientation(LinearLayout.VERTICAL);
+        l.setGravity(Gravity.CENTER);
+        l.setBackgroundColor(mavi);
+        l.setPadding(dp(36), dp(36), dp(36), dp(36));
+
+        TextView logo = new TextView(this);
+        logo.setText("Smart TV");
+        logo.setTextColor(0xFFFFFFFF);
+        logo.setTextSize(34);
+        logo.setGravity(Gravity.CENTER);
+        logo.setPadding(0, 0, 0, dp(28));
+        l.addView(logo);
+
+        TextView metin = new TextView(this);
+        metin.setText(TALIMATLAR[sayfa]);
+        metin.setTextColor(0xFFFFFFFF);
+        metin.setTextSize(17);
+        metin.setGravity(Gravity.CENTER);
+        metin.setLineSpacing(dp(4), 1f);
+        l.addView(metin);
+
+        TextView sayac = new TextView(this);
+        sayac.setText((sayfa + 1) + " / " + TALIMATLAR.length);
+        sayac.setTextColor(0xAAFFFFFF);
+        sayac.setTextSize(13);
+        sayac.setGravity(Gravity.CENTER);
+        sayac.setPadding(0, dp(20), 0, dp(8));
+        l.addView(sayac);
+
+        final boolean sonSayfa = sayfa == TALIMATLAR.length - 1;
+
+        final CheckBox gizle = new CheckBox(this);
+        gizle.setText("Bir daha gösterme");
+        gizle.setTextColor(0xFFFFFFFF);
+        if (sonSayfa) l.addView(gizle);
+
+        Button buton = new Button(this);
+        buton.setText(sonSayfa ? "DEVAM" : "SONRAKİ");
+        buton.setTextColor(mavi);
+        buton.setBackgroundColor(0xFFFFFFFF);
+        LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(dp(200),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        blp.topMargin = dp(16);
+        l.addView(buton, blp);
+
+        buton.setOnClickListener(v -> {
+            if (sonSayfa) {
+                if (gizle.isChecked()) p.edit().putBoolean("talimatGizle", true).apply();
+                sifreEkrani(p);
+            } else {
+                talimatEkrani(p, sayfa + 1);
+            }
+        });
+
+        setContentView(l);
     }
 
     private void sifreEkrani(final SharedPreferences p) {
+        final int mavi = 0xFF1E6FE8;
+
         LinearLayout l = new LinearLayout(this);
         l.setOrientation(LinearLayout.VERTICAL);
-        l.setPadding(dp(32), dp(80), dp(32), dp(32));
-        TextView t = new TextView(this);
-        t.setText("Smart TV");
-        t.setTextSize(24);
-        l.addView(t);
-        TextView a = new TextView(this);
-        a.setText("Devam etmek için şifreyi girin");
-        a.setPadding(0, dp(12), 0, dp(8));
-        l.addView(a);
+        l.setGravity(Gravity.CENTER);
+        l.setBackgroundColor(mavi);
+        l.setPadding(dp(36), dp(36), dp(36), dp(36));
+
+        TextView logo = new TextView(this);
+        logo.setText("Smart TV");
+        logo.setTextColor(0xFFFFFFFF);
+        logo.setTextSize(40);
+        logo.setGravity(Gravity.CENTER);
+        l.addView(logo);
+
+        final TextView altYazi = new TextView(this);
+        altYazi.setTextColor(0xCCFFFFFF);
+        altYazi.setTextSize(15);
+        altYazi.setGravity(Gravity.CENTER);
+        altYazi.setPadding(0, dp(10), 0, dp(28));
+        l.addView(altYazi);
+
         final EditText giris = new EditText(this);
         giris.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         giris.setHint("Şifre");
-        l.addView(giris);
-        Button ac = new Button(this);
-        ac.setText("Aç");
-        ac.setOnClickListener(v -> {
-            if (ozet(giris.getText().toString()).equals(p.getString("sifre", ""))) ayarlarEkrani(p);
-            else {
+        giris.setHintTextColor(0x99FFFFFF);
+        giris.setTextColor(0xFFFFFFFF);
+        giris.setGravity(Gravity.CENTER);
+        giris.setTextSize(20);
+        giris.setVisibility(View.GONE);
+        LinearLayout.LayoutParams glp = new LinearLayout.LayoutParams(dp(200),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        l.addView(giris, glp);
+
+        final Button buton = new Button(this);
+        buton.setText("BAŞLA");
+        buton.setTextColor(mavi);
+        buton.setBackgroundColor(0xFFFFFFFF);
+        LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(dp(200),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        blp.topMargin = dp(20);
+        l.addView(buton, blp);
+
+        altYazi.setText("Başlamak için dokunun");
+        final boolean[] acik = {false};
+        buton.setOnClickListener(v -> {
+            if (!acik[0]) {
+                acik[0] = true;
+                altYazi.setText("Devam etmek için şifreyi girin");
+                giris.setVisibility(View.VISIBLE);
+                giris.requestFocus();
+                buton.setText("AÇ");
+                return;
+            }
+            if (ozet(giris.getText().toString()).equals(p.getString("sifre", ""))) {
+                ayarlarEkrani(p);
+            } else {
                 giris.setText("");
                 Toast.makeText(this, "Şifre yanlış", Toast.LENGTH_SHORT).show();
             }
         });
-        l.addView(ac);
+
         setContentView(l);
     }
 
